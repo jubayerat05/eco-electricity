@@ -29,7 +29,4 @@ services:
     publishDir: dist
     envVars:
       - key: VITE_BACKEND_URL
-        fromService:
-          name: eco-electricity-backend
-          type: web
-          property: host
+        sync: false

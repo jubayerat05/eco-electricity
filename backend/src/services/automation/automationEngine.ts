@@ -67,6 +67,10 @@ export class AutomationEngine {
       this.roomOccupancy[room] = occupied;
       // Broadcast occupancy update to clients immediately
       context.socketService.broadcast('occupancyUpdated', this.roomOccupancy);
+      
+      // Force immediate rule evaluation on manual override to ensure instant device shutdown
+      this.evaluateTick().catch((err) => console.error('[Automation Engine] Manual occupancy evaluateTick failed:', err));
+      
       return true;
     }
     return false;
@@ -217,7 +221,9 @@ export class AutomationEngine {
     const actionVal = rule.action.value; // ON | OFF
     
     if (rule.action.target === 'ALL_LIGHTS') {
-      const activeLights = devices.filter((d) => d.type === 'light' && d.status !== actionVal);
+      const activeLights = devices.filter(
+        (d) => d.type === 'light' && d.status !== actionVal && (!rule.condition.room || d.room === rule.condition.room)
+      );
       for (const light of activeLights) {
         const impact = await this.actionExecutor.executeToggle(light.id, actionVal);
         if (impact) {
@@ -227,7 +233,9 @@ export class AutomationEngine {
         }
       }
     } else if (rule.action.target === 'ALL_FANS') {
-      const activeFans = devices.filter((d) => d.type === 'fan' && d.status !== actionVal);
+      const activeFans = devices.filter(
+        (d) => d.type === 'fan' && d.status !== actionVal && (!rule.condition.room || d.room === rule.condition.room)
+      );
       for (const fan of activeFans) {
         const impact = await this.actionExecutor.executeToggle(fan.id, actionVal);
         if (impact) {

@@ -62,6 +62,16 @@ export class AutomationEngine {
     return this.roomOccupancy;
   }
 
+  setOccupancy(room: string, occupied: boolean): boolean {
+    if (this.roomOccupancy[room] !== undefined) {
+      this.roomOccupancy[room] = occupied;
+      // Broadcast occupancy update to clients immediately
+      context.socketService.broadcast('occupancyUpdated', this.roomOccupancy);
+      return true;
+    }
+    return false;
+  }
+
   getIsEnabled(): boolean {
     return this.isEnabled;
   }
@@ -97,14 +107,6 @@ export class AutomationEngine {
     // 1. Shift simulated room occupancy randomly
     if (this.getMode() === 'VACATION') {
       this.roomOccupancy = { drawing: false, work1: false, work2: false };
-    } else if (this.tickCounter % 15 === 0) {
-      // Toggle rooms randomly
-      const rooms = ['drawing', 'work1', 'work2'];
-      const targetRoom = rooms[Math.floor(Math.random() * rooms.length)];
-      this.roomOccupancy[targetRoom] = !this.roomOccupancy[targetRoom];
-
-      // Broadcast occupancy update to client
-      context.socketService.broadcast('occupancyUpdated', this.roomOccupancy);
     }
 
     if (!this.isEnabled) return;

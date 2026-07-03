@@ -11,7 +11,8 @@ router.get('/rules', controller.getRules);
 router.post('/rules', controller.createRule);
 router.put('/rules/:id', controller.updateRule);
 router.delete('/rules/:id', controller.deleteRule);
-router.get('/logs', controller.getLogs);
 router.post('/undo', controller.undo);
+router.post('/occupancy', controller.setOccupancy);
+router.get('/logs', controller.getLogs);
 
 export default router;

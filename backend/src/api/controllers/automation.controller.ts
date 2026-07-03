@@ -118,4 +118,23 @@ export class AutomationController {
       res.status(500).json({ error: 'Failed to revert last automation actions' });
     }
   };
+
+  setOccupancy = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { room, occupied } = req.body;
+      if (!room || typeof occupied !== 'boolean') {
+        res.status(400).json({ error: 'Payload must contain a string "room" and a boolean "occupied"' });
+        return;
+      }
+      const success = context.automationEngine.setOccupancy(room, occupied);
+      if (!success) {
+        res.status(400).json({ error: `Invalid room name: ${room}` });
+        return;
+      }
+      res.json({ success: true, room, occupied });
+    } catch (error) {
+      console.error('[Automation Controller] setOccupancy failed:', error);
+      res.status(500).json({ error: 'Failed to update occupancy' });
+    }
+  };
 }

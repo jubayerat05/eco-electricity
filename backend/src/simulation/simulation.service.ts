@@ -138,8 +138,8 @@ export class SimulationService extends EventEmitter {
     // Tick the power accumulator
     await this.powerService.tickAccumulator(elapsedSeconds);
 
-    // 2. Check if it's time to toggle a random device
-    if (this.simulatedClockSeconds >= this.nextToggleClockSeconds) {
+    // 2. Check if it's time to toggle a random device (only if enabled)
+    if (config.enableRandomToggle && this.simulatedClockSeconds >= this.nextToggleClockSeconds) {
       await this.toggleRandomDevice();
       this.scheduleNextToggle();
     }

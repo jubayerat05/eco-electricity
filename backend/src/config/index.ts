@@ -17,6 +17,7 @@ export const config = {
     end: parseInt(process.env.OFFICE_HOURS_END || '17', 10)     // Hour, e.g. 17 for 5 PM
   },
   powerThreshold: parseFloat(process.env.POWER_THRESHOLD || '800'), // Watts
+  enableRandomToggle: process.env.ENABLE_RANDOM_TOGGLE === 'true',
   nodeEnv: process.env.NODE_ENV || 'development',
   geminiApiKey: process.env.GEMINI_API_KEY || ''
 };

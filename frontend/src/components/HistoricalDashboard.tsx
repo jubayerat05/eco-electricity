@@ -63,7 +63,7 @@ interface DeviceUptime {
 }
 
 export const HistoricalDashboard: React.FC = () => {
-  const { devices, powerState } = useSocket();
+  const { socket, devices, powerState } = useSocket();
   const { t } = useLanguage();
   const [range, setRange] = useState<'live' | 'hour' | 'today' | 'week'>('today');
   const [summary, setSummary] = useState<SummaryData | null>(null);
@@ -101,9 +101,50 @@ export const HistoricalDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchAnalytics();
-    const interval = setInterval(fetchAnalytics, 5000);
+    const interval = setInterval(fetchAnalytics, 1000); // Poll every 1s for per-second precision
     return () => clearInterval(interval);
   }, [range]);
+
+  // Real-time per-second WebSocket listener for smooth graph & calculation updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleHistoryTick = (newEntry: HistoryEntry) => {
+      setHistory((prev) => {
+        const updated = [...prev, newEntry];
+        const maxPoints = range === 'live' ? 25 : range === 'hour' ? 3600 : 7200;
+        return updated.slice(-maxPoints);
+      });
+
+      setSummary((prev) => {
+        if (!prev) return null;
+        const tickKwh = newEntry.kwhPerSecond || (newEntry.totalPower / 1000) / 3600;
+        const newTotalEnergy = prev.totalEnergyUsed + tickKwh;
+        return {
+          ...prev,
+          currentPower: newEntry.totalPower,
+          totalEnergyUsed: Number(newTotalEnergy.toFixed(4)),
+          todayCost: Number((newTotalEnergy * 12.39).toFixed(2))
+        };
+      });
+
+      setRooms((prev) =>
+        prev.map((r) => {
+          const roomPower = newEntry.roomPowers[r.room] ?? r.currentPower;
+          return {
+            ...r,
+            currentPower: roomPower,
+            peakPower: Math.max(r.peakPower, roomPower)
+          };
+        })
+      );
+    };
+
+    socket.on('historyTick', handleHistoryTick);
+    return () => {
+      socket.off('historyTick', handleHistoryTick);
+    };
+  }, [socket, range]);
 
   // SVG Helper to scale line chart path
   const renderLineChartPath = () => {
@@ -311,14 +352,14 @@ export const HistoricalDashboard: React.FC = () => {
                     <line x1="10" y1="140" x2="590" y2="140" stroke="#1e293b" strokeDasharray="3" />
                     
                     {/* Area fill */}
-                    <path d={renderAreaChartPath()} fill="url(#areaGrad)" />
+                    <path d={renderAreaChartPath()} fill="url(#areaGrad)" className="transition-all duration-500 ease-out" />
                     {/* Trend Line */}
                     <path
                       d={renderLineChartPath()}
                       fill="none"
                       stroke="#0284c7"
                       strokeWidth="2.5"
-                      className="transition-all duration-500"
+                      className="transition-all duration-500 ease-out"
                     />
                   </svg>
                 </div>

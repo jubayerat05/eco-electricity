@@ -70,7 +70,7 @@ context.simulationService.on('tick', async () => {
     const activeAlertsCount = alerts.filter((a) => !a.resolved).length;
     const kwhPerSecond = (powerState.totalPowerDraw / 1000) / 3600;
 
-    context.historyService.addEntry({
+    const historyEntry = {
       timestamp: new Date().toISOString(),
       totalPower: powerState.totalPowerDraw,
       roomPowers,
@@ -78,7 +78,12 @@ context.simulationService.on('tick', async () => {
       activeAlertsCount,
       efficiencyScore: insights.efficiencyScore,
       kwhPerSecond: Number(kwhPerSecond.toFixed(7))
-    });
+    };
+
+    context.historyService.addEntry(historyEntry);
+
+    // Broadcast per-second telemetry snapshot to WebSocket clients for smooth real-time analytics
+    context.socketService.broadcast('historyTick', historyEntry);
   } catch (err) {
     console.error('[AI System] Error calculating/broadcasting insights:', err);
   }

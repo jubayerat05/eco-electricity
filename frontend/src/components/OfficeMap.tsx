@@ -231,6 +231,14 @@ export const OfficeMap: React.FC = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.occupancy) setOccupancy(data.occupancy);
+        if (data.stats) {
+          if (typeof data.stats.totalKwhSaved === 'number') {
+            setEnergySavedAccumulated(data.stats.totalKwhSaved);
+          }
+          if (typeof data.stats.devicesTurnedOffCount === 'number') {
+            setAutoShutdownEvents(data.stats.devicesTurnedOffCount);
+          }
+        }
       })
       .catch((err) => console.error('Failed to fetch occupancy:', err));
 
@@ -238,9 +246,22 @@ export const OfficeMap: React.FC = () => {
     const handleOccupancy = (occ: Record<string, boolean>) => {
       setOccupancy(occ);
     };
+    const handleAutomationUpdated = (data: any) => {
+      if (data.occupancy) setOccupancy(data.occupancy);
+      if (data.stats) {
+        if (typeof data.stats.totalKwhSaved === 'number') {
+          setEnergySavedAccumulated(data.stats.totalKwhSaved);
+        }
+        if (typeof data.stats.devicesTurnedOffCount === 'number') {
+          setAutoShutdownEvents(data.stats.devicesTurnedOffCount);
+        }
+      }
+    };
     socket.on('occupancyUpdated', handleOccupancy);
+    socket.on('automationUpdated', handleAutomationUpdated);
     return () => {
       socket.off('occupancyUpdated', handleOccupancy);
+      socket.off('automationUpdated', handleAutomationUpdated);
     };
   }, [socket]);
 

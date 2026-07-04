@@ -15,8 +15,8 @@ export const OfficeMap: React.FC = () => {
   const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d'); // '2d' (Architectural diagram) or '3d' (Isometric view)
 
   // 3D View Controls state (for 3D mode)
-  const [rotX, setRotX] = useState<number>(55);
-  const [rotZ, setRotZ] = useState<number>(-45);
+  const [rotX, setRotX] = useState<number>(45);
+  const [rotZ, setRotZ] = useState<number>(0);
   const [zoom, setZoom] = useState<number>(1.0);
   const [isAutoOrbit, setIsAutoOrbit] = useState<boolean>(false);
   const animRef = useRef<number | null>(null);

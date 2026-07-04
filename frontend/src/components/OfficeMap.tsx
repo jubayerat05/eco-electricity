@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Fan, Lightbulb, Layers, ArrowUp, Compass, SlidersHorizontal, Play, Pause, RotateCcw, Zap, UserPlus, UserMinus, Activity, Clock, Coins, TrendingUp } from 'lucide-react';
+import { Fan, Lightbulb, Layers, ArrowUp, Compass, Play, Pause, RotateCcw, Zap, UserPlus, UserMinus, Activity, Clock, Coins, TrendingUp } from 'lucide-react';
 import type { RoomId, Device } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,11 +15,9 @@ export const OfficeMap: React.FC = () => {
   const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d'); // '2d' (Architectural diagram) or '3d' (Isometric view)
 
   // 3D View Controls state (for 3D mode)
-  const [rotX, setRotX] = useState<number>(45);
-  const [rotZ, setRotZ] = useState<number>(0);
-  const [zoom, setZoom] = useState<number>(1.0);
-  const [isAutoOrbit, setIsAutoOrbit] = useState<boolean>(false);
-  const animRef = useRef<number | null>(null);
+  const rotX = 0;
+  const rotZ = 0;
+  const zoom = 1.35;
 
   // ── Smart Occupancy Simulation State ──
   const [roomOccupants, setRoomOccupants] = useState<Record<RoomId, number>>({
@@ -209,21 +207,7 @@ export const OfficeMap: React.FC = () => {
     return () => clearInterval(interval);
   }, [isAutoDemo, roomOccupants]);
 
-  // Auto-orbit loop
-  useEffect(() => {
-    if (isAutoOrbit && viewMode === '3d') {
-      const orbitStep = () => {
-        setRotZ((prev) => (prev >= 180 ? -180 : prev + 0.4));
-        animRef.current = requestAnimationFrame(orbitStep);
-      };
-      animRef.current = requestAnimationFrame(orbitStep);
-    } else if (animRef.current) {
-      cancelAnimationFrame(animRef.current);
-    }
-    return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-    };
-  }, [isAutoOrbit, viewMode]);
+
 
   // Query occupancy status on load & listen to real-time events
   useEffect(() => {
@@ -930,21 +914,9 @@ export const OfficeMap: React.FC = () => {
                     </span>
                   </h3>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Interactive 3D perspective view — click devices to toggle, use sliders to orbit
+                    Interactive 3D perspective view — click devices to toggle, hover rooms to zoom
                   </p>
                 </div>
-
-                <button
-                  onClick={() => setIsAutoOrbit(!isAutoOrbit)}
-                  className={`px-4 py-2 rounded-2xl text-xs font-bold border transition-all duration-300 flex items-center gap-2 ${
-                    isAutoOrbit
-                      ? 'bg-indigo-600/90 border-indigo-400/50 text-white shadow-lg shadow-indigo-500/30'
-                      : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:bg-slate-700/80 hover:text-slate-200'
-                  }`}
-                >
-                  <Compass size={14} className={isAutoOrbit ? 'animate-spin' : ''} style={isAutoOrbit ? { animationDuration: '3s' } : {}} />
-                  {isAutoOrbit ? 'Orbiting' : 'Auto-Orbit'}
-                </button>
               </div>
 
               {/* ── Floating Status Badges Row ── */}
@@ -1013,7 +985,9 @@ export const OfficeMap: React.FC = () => {
                   >
 
                     {/* ═══ DRAWING ROOM (Left) ═══ */}
-                    <div
+                    <motion.div
+                      whileHover={{ scale: 1.05, zIndex: 10, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)' }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                       className={`relative transition-all duration-700 overflow-hidden border-r-2 border-slate-700/60 ${
                         roomOccupants.drawing > 0
                           ? 'bg-gradient-to-br from-[#e8ddd0] to-[#d2c4b2]'
@@ -1106,10 +1080,12 @@ export const OfficeMap: React.FC = () => {
                       <div className="absolute right-3 bottom-3 z-20" style={{ transform: 'translateZ(42px)', transformStyle: 'preserve-3d' }}>
                         {renderTopDownLight(getRoomDevices('drawing')[3] || { id: 'drawing-light-2', status: 'OFF' } as Device)}
                       </div>
-                    </div>
+                    </motion.div>
 
                     {/* ═══ WORK ROOM 1 (Middle) ═══ */}
-                    <div
+                    <motion.div
+                      whileHover={{ scale: 1.05, zIndex: 10, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)' }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                       className={`relative transition-all duration-700 overflow-hidden border-r-2 border-slate-700/60 ${
                         roomOccupants.work1 > 0
                           ? 'bg-gradient-to-br from-[#e2e5ea] to-[#d5d8dc]'
@@ -1207,10 +1183,12 @@ export const OfficeMap: React.FC = () => {
                       <div className="absolute right-4 bottom-4 z-20" style={{ transform: 'translateZ(42px)', transformStyle: 'preserve-3d' }}>
                         {renderTopDownFan(getRoomDevices('work1')[1] || { id: 'work1-fan-2', status: 'OFF' } as Device)}
                       </div>
-                    </div>
+                    </motion.div>
 
                     {/* ═══ WORK ROOM 2 (Right) ═══ */}
-                    <div
+                    <motion.div
+                      whileHover={{ scale: 1.05, zIndex: 10, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)' }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                       className={`relative transition-all duration-700 overflow-hidden ${
                         roomOccupants.work2 > 0
                           ? 'bg-gradient-to-br from-[#dcc9b3] to-[#cbb297]'
@@ -1308,79 +1286,9 @@ export const OfficeMap: React.FC = () => {
                       <div className="absolute right-4 bottom-4 z-20" style={{ transform: 'translateZ(42px)', transformStyle: 'preserve-3d' }}>
                         {renderTopDownFan(getRoomDevices('work2')[1] || { id: 'work2-fan-2', status: 'OFF' } as Device)}
                       </div>
-                    </div>
+                    </motion.div>
 
                   </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* ── 3D Perspective Sliders Control Box ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.15 }}
-              className="p-5 rounded-3xl bg-gradient-to-br from-slate-900/60 to-slate-950/80 border border-slate-700/40 backdrop-blur-md shadow-lg"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-                  <SlidersHorizontal size={14} className="text-indigo-400" />
-                  <span>{t('map.viewControls')}</span>
-                </div>
-                <div className="text-[9px] font-mono text-slate-600 bg-slate-800/60 px-2 py-0.5 rounded-md border border-slate-700/30">
-                  X:{Math.round(rotX)}° Z:{Math.round(rotZ)}° S:{zoom.toFixed(1)}x
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-                {/* Rotation Z */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-400 flex items-center gap-1"><Compass size={11} className="text-indigo-400/60" /> Rotation</span>
-                    <span className="text-indigo-400 font-mono text-[11px]">{Math.round(rotZ)}°</span>
-                  </div>
-                  <input
-                    type="range" min="-180" max="180" value={rotZ}
-                    onChange={(e) => { setIsAutoOrbit(false); setRotZ(Number(e.target.value)); }}
-                    className="w-full accent-indigo-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer"
-                  />
-                </div>
-                {/* Tilt X */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-400 flex items-center gap-1"><ArrowUp size={11} className="text-indigo-400/60" /> Tilt</span>
-                    <span className="text-indigo-400 font-mono text-[11px]">{Math.round(rotX)}°</span>
-                  </div>
-                  <input
-                    type="range" min="15" max="85" value={rotX}
-                    onChange={(e) => { setIsAutoOrbit(false); setRotX(Number(e.target.value)); }}
-                    className="w-full accent-indigo-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer"
-                  />
-                </div>
-                {/* Zoom */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-400 flex items-center gap-1"><Layers size={11} className="text-indigo-400/60" /> Zoom</span>
-                    <span className="text-indigo-400 font-mono text-[11px]">{zoom.toFixed(2)}x</span>
-                  </div>
-                  <input
-                    type="range" min="0.7" max="1.3" step="0.05" value={zoom}
-                    onChange={(e) => setZoom(Number(e.target.value))}
-                    className="w-full accent-indigo-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer"
-                  />
-                </div>
-                {/* Auto-Orbit Toggle */}
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-bold text-slate-400">Auto-Orbit</div>
-                  <button
-                    onClick={() => setIsAutoOrbit(!isAutoOrbit)}
-                    className={`w-full py-2 rounded-xl text-xs font-bold border transition-all duration-300 ${
-                      isAutoOrbit
-                        ? 'bg-indigo-600/80 border-indigo-400/40 text-white shadow-md shadow-indigo-500/20'
-                        : 'bg-slate-800/60 border-slate-700/40 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60'
-                    }`}
-                  >
-                    {isAutoOrbit ? 'Orbiting...' : 'Enable Orbit'}
-                  </button>
                 </div>
               </div>
             </motion.div>

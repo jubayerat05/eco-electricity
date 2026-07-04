@@ -6,7 +6,7 @@ export class AIInsightsController {
 
   getInsights = async (req: Request, res: Response): Promise<void> => {
     try {
-      const insights = this.analyzer.getLatestInsights();
+      const insights = await this.analyzer.calculateInsights();
       res.json(insights);
     } catch (error) {
       console.error('[AI Controller] Failed to get latest insights:', error);

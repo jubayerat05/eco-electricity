@@ -104,6 +104,8 @@ export class AutomationEngine {
     };
   }
 
+  private lastOccupancyState: Record<string, boolean> = {};
+
   // Evaluate rules on simulator ticks
   async evaluateTick(): Promise<void> {
     this.tickCounter++;
@@ -116,7 +118,6 @@ export class AutomationEngine {
     if (!this.isEnabled) return;
 
     const devices = await context.deviceRepo.getAll();
-    const currentHour = new Date().getHours();
     const currentHourStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
     const activeImpacts: ActionImpact[] = [];
@@ -172,9 +173,14 @@ export class AutomationEngine {
           const room = rule.condition.room;
           if (room) {
             const isOccupied = this.roomOccupancy[room];
+            const prevOccupied = this.lastOccupancyState[room] ?? !isOccupied;
             const condIsEmpty = rule.condition.value === 'empty';
 
-            if ((condIsEmpty && !isOccupied) || (!condIsEmpty && isOccupied)) {
+            if (condIsEmpty && !isOccupied) {
+              // Automatically shut off devices in empty rooms
+              await this.fireRuleAction(rule, devices, activeImpacts);
+            } else if (!condIsEmpty && isOccupied && !prevOccupied) {
+              // Trigger ON action when room transitions from empty to occupied
               await this.fireRuleAction(rule, devices, activeImpacts);
             }
           }
@@ -215,6 +221,8 @@ export class AutomationEngine {
       // Send friendly bot status update
       context.discordService.sendAlert(`🌿 [Smart Automation] Triggered state changes on ${activeImpacts.length} device(s) saving ${totalPowerSaved}W.`);
     }
+
+    this.lastOccupancyState = { ...this.roomOccupancy };
   }
 
   private async fireRuleAction(rule: AutomationRule, devices: Device[], impacts: ActionImpact[]) {

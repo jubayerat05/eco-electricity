@@ -94,9 +94,9 @@ export class AIInsightsAnalyzer {
       ? activeDevices.reduce((max, d) => (d.powerDraw > max.powerDraw ? d : max), activeDevices[0]).name
       : 'None';
 
-    // Estimate daily cost (assuming $0.15 per kWh)
+    // Estimate daily cost (using standard grid rate 12.39 per kWh)
     const kwhToday = powerState.estimatedKwhToday;
-    const estimatedDailyCost = kwhToday * 0.15;
+    const estimatedDailyCost = kwhToday * 12.39;
 
     // 6. Trend Analysis
     let status: 'INCREASING' | 'DECREASING' | 'STABLE' = 'STABLE';
@@ -116,6 +116,10 @@ export class AIInsightsAnalyzer {
 
     const highestConsumingRoom = maxActiveRoom.power > 0 ? roomLabels[maxActiveRoom.roomId] : 'None';
 
+    const now = new Date();
+    const currHour = now.getHours();
+    const peakUsageTime = `${currHour % 12 || 12}:00 ${currHour >= 12 ? 'PM' : 'AM'}`;
+
     const insights: AIInsights = {
       summary,
       efficiencyScore: scoreDetails.score,
@@ -131,7 +135,7 @@ export class AIInsightsAnalyzer {
       },
       trendAnalysis: {
         status,
-        peakUsageTime: '2:30 PM', // Fixed representative peak hour
+        peakUsageTime,
         averageHourlyUsage,
         highestConsumingRoom
       }

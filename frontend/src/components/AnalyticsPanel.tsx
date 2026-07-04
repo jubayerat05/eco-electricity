@@ -158,12 +158,14 @@ export const AnalyticsPanel: React.FC = () => {
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Room Load Breakdown</h3>
           <div className="flex flex-col gap-4">
             {powerState?.rooms.map((roomSummary) => {
-              const pct = Math.min((roomSummary.powerDraw / 400) * 100, 100);
+              const roomCapacities: Record<string, number> = { drawing: 270, work1: 195, work2: 120 };
+              const maxCap = roomCapacities[roomSummary.room] || 270;
+              const pct = Math.min(100, Math.round((roomSummary.powerDraw / maxCap) * 100));
               return (
                 <div key={roomSummary.room} className="flex flex-col gap-2">
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-slate-300">{getRoomName(roomSummary.room)}</span>
-                    <span className="text-indigo-400">{roomSummary.powerDraw} W</span>
+                    <span className="text-indigo-400">{roomSummary.powerDraw} W <span className="text-[10px] text-slate-500 font-normal">({pct}%)</span></span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-950 border border-slate-900 rounded-full overflow-hidden">
                     <div

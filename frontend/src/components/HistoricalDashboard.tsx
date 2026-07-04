@@ -100,7 +100,9 @@ export const HistoricalDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchAnalytics();
-  }, [range, devices, powerState]);
+    const interval = setInterval(fetchAnalytics, 5000);
+    return () => clearInterval(interval);
+  }, [range]);
 
   // SVG Helper to scale line chart path
   const renderLineChartPath = () => {
@@ -212,7 +214,7 @@ export const HistoricalDashboard: React.FC = () => {
             <div className="p-4 rounded-2xl bg-slate-900/30 border border-slate-850 hover:scale-[1.02] transition-transform duration-300">
               <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Current Power</span>
               <div className="text-lg font-black text-sky-400 mt-1 flex items-baseline gap-1">
-                {summary.currentPower}
+                {powerState?.totalPowerDraw ?? summary.currentPower}
                 <span className="text-[10px] text-slate-400 font-medium">W</span>
               </div>
             </div>
@@ -373,13 +375,32 @@ export const HistoricalDashboard: React.FC = () => {
                 </span>
                 <div className="grid grid-cols-12 gap-1">
                   {Array.from({ length: 24 }).map((_, i) => {
-                    // Pick a random heat weight based on hours
-                    const hourWeight = i > 8 && i < 18 ? 'bg-sky-500/80 border-sky-400/20' : 'bg-slate-900 border-slate-800';
+                    // Filter history entries matching hour i
+                    const entriesForHour = history.filter((h) => new Date(h.timestamp).getHours() === i);
+                    let hourWeight = 'bg-slate-900 border-slate-800';
+                    let loadText = 'No data';
+
+                    if (entriesForHour.length > 0) {
+                      const avgLoad = entriesForHour.reduce((sum, h) => sum + h.totalPower, 0) / entriesForHour.length;
+                      loadText = `${Math.round(avgLoad)}W avg`;
+                      if (avgLoad > 400) {
+                        hourWeight = 'bg-rose-500/80 border-rose-400/30';
+                      } else if (avgLoad > 200) {
+                        hourWeight = 'bg-amber-500/80 border-amber-400/30';
+                      } else if (avgLoad > 50) {
+                        hourWeight = 'bg-sky-500/80 border-sky-400/30';
+                      } else {
+                        hourWeight = 'bg-emerald-500/60 border-emerald-400/30';
+                      }
+                    } else if (i >= 9 && i < 17) {
+                      hourWeight = 'bg-sky-500/40 border-sky-400/20';
+                    }
+
                     return (
                       <div
                         key={i}
                         className={`h-4 rounded border ${hourWeight} hover:scale-105 transition-transform cursor-pointer`}
-                        title={`Hour ${i}:00`}
+                        title={`Hour ${i}:00 - ${loadText}`}
                       />
                     );
                   })}

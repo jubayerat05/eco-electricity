@@ -8,7 +8,8 @@ import {
   Settings, Eye, EyeOff, Bot
 } from 'lucide-react';
 
-const API = 'http://localhost:5000/automation';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const API = `${BACKEND_URL}/automation`;
 
 interface AutomationRule {
   id: string;
@@ -174,6 +175,20 @@ export const AutomationDashboard: React.FC = () => {
   const undoAction = async () => {
     await fetch(`${API}/undo`, { method: 'POST' });
     setTimeout(fetchAll, 500);
+  };
+
+  const toggleOccupancy = async (room: string, currentOccupied: boolean) => {
+    try {
+      const nextState = !currentOccupied;
+      await fetch(`${API}/occupancy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room, occupied: nextState })
+      });
+      setOccupancy((prev) => ({ ...prev, [room]: nextState }));
+    } catch (err) {
+      console.error('Failed to toggle occupancy:', err);
+    }
   };
 
   const resetRuleBuilder = () => {
@@ -348,13 +363,15 @@ export const AutomationDashboard: React.FC = () => {
         </div>
         <div className="grid grid-cols-3 gap-3">
           {Object.entries(occupancy).map(([room, isOccupied]) => (
-            <div
+            <button
               key={room}
-              className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${
+              onClick={() => toggleOccupancy(room, isOccupied)}
+              className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all hover:scale-[1.02] active:scale-[0.98] ${
                 isOccupied
-                  ? 'bg-emerald-500/10 border-emerald-500/20'
-                  : 'bg-slate-700/30 border-slate-600/30'
+                  ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                  : 'bg-slate-700/30 border-slate-600/30 hover:bg-slate-700/50'
               }`}
+              title="Click to toggle room occupancy"
             >
               <div className={`w-2.5 h-2.5 rounded-full ${
                 isOccupied ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse' : 'bg-slate-500'
@@ -362,10 +379,10 @@ export const AutomationDashboard: React.FC = () => {
               <div>
                 <div className="text-xs font-semibold text-white">{roomLabels[room] || room}</div>
                 <div className={`text-[10px] font-medium ${isOccupied ? 'text-emerald-400' : 'text-slate-500'}`}>
-                  {isOccupied ? 'Occupied' : 'Empty'}
+                  {isOccupied ? 'Occupied (Click to empty)' : 'Empty (Click to occupy)'}
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

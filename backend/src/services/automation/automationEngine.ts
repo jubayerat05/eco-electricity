@@ -179,8 +179,8 @@ export class AutomationEngine {
             if (condIsEmpty && !isOccupied) {
               // Automatically shut off devices in empty rooms
               await this.fireRuleAction(rule, devices, activeImpacts);
-            } else if (!condIsEmpty && isOccupied && !prevOccupied) {
-              // Trigger ON action when room transitions from empty to occupied
+            } else if (!condIsEmpty && isOccupied) {
+              // Ensure devices are ON whenever room is occupied
               await this.fireRuleAction(rule, devices, activeImpacts);
             }
           }

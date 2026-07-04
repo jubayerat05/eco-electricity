@@ -9,6 +9,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export class DiscordService {
   private client: Client | null = null;
   private isMock = false;
+  private processedMessageIds: Set<string> = new Set();
 
   constructor(
     private deviceRepo: IDeviceRepository,
@@ -23,6 +24,11 @@ export class DiscordService {
 
   async start() {
     if (this.isMock) {
+      return;
+    }
+
+    if (this.client) {
+      console.warn('[Discord] Client is already started. Skipping duplicate initialization.');
       return;
     }
 
@@ -47,6 +53,14 @@ export class DiscordService {
         const text = message.content.trim();
         if (!text.startsWith('!')) return;
 
+        // Deduplicate: avoid responding multiple times to the exact same message ID
+        if (this.processedMessageIds.has(message.id)) return;
+        this.processedMessageIds.add(message.id);
+        if (this.processedMessageIds.size > 500) {
+          const firstKey = this.processedMessageIds.values().next().value;
+          if (firstKey) this.processedMessageIds.delete(firstKey);
+        }
+
         console.log(`[Discord] Command received: "${text}" from ${message.author.username}`);
         const response = await this.handleCommand(text);
 
@@ -57,6 +71,18 @@ export class DiscordService {
     } catch (error) {
       console.error('[Discord] Failed to start Discord client, falling back to mock mode:', error);
       this.isMock = true;
+    }
+  }
+
+  async stop() {
+    if (this.client) {
+      try {
+        await this.client.destroy();
+        console.log('[Discord] Bot logged out and client destroyed.');
+      } catch (err) {
+        console.error('[Discord] Error shutting down client:', err);
+      }
+      this.client = null;
     }
   }
 

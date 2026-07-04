@@ -12,6 +12,10 @@ export class MqttService {
   ) {}
 
   start(brokerUrl = 'mqtt://broker.hivemq.com:1883') {
+    if (this.client) {
+      console.warn('[MQTT] Client is already started.');
+      return;
+    }
     try {
       this.client = mqtt.connect(brokerUrl, {
         clientId: `backend-smartoffice-${Math.random().toString(16).substring(2, 8)}`,
@@ -47,6 +51,14 @@ export class MqttService {
 
     } catch (err) {
       console.error('[MQTT] Failed to start MQTT service:', err);
+    }
+  }
+
+  stop() {
+    if (this.client) {
+      this.client.end(true);
+      this.client = null;
+      console.log('[MQTT] Disconnected from MQTT broker.');
     }
   }
 

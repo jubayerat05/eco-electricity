@@ -91,6 +91,19 @@ app.get('/health', (req, res) => {
   });
 });
 
-server.listen(config.port, () => {
+const serverInstance = server.listen(config.port, () => {
   console.log(`[Server] Office IoT Backend listening on port ${config.port} in ${config.nodeEnv} mode`);
 });
+
+const shutdown = async (signal: string) => {
+  console.log(`[Server] Received ${signal}. Shutting down services...`);
+  await context.discordService.stop();
+  context.mqttService.stop();
+  serverInstance.close(() => {
+    console.log('[Server] HTTP server closed.');
+    process.exit(0);
+  });
+};
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));

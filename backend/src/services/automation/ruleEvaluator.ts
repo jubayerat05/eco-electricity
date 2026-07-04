@@ -30,7 +30,7 @@ export class RuleEvaluator {
       {
         id: 'rule-office-hours',
         name: 'Office Hours Rule',
-        enabled: true,
+        enabled: false,
         triggerType: 'TIME',
         condition: {
           operator: 'GREATER_THAN',
@@ -45,7 +45,7 @@ export class RuleEvaluator {
       {
         id: 'rule-idle-devices',
         name: 'Idle Device Rule',
-        enabled: true,
+        enabled: false,
         triggerType: 'IDLE',
         condition: {
           operator: 'GREATER_THAN',

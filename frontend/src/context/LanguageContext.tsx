@@ -4,7 +4,7 @@ type Language = 'en' | 'bn';
 
 const translations: Record<string, Record<Language, string>> = {
   // ─── Header ──────────────────────────────────────────────
-  'dashboard.title': { en: 'Office IoT Power Dashboard', bn: 'অফিস আইওটি পাওয়ার ড্যাশবোর্ড' },
+  'dashboard.title': { en: 'Eco-Electricity', bn: 'ইকো-ইলেকট্রিসিটি' },
   'dashboard.subtitle': { en: 'Real-time building management & analytics', bn: 'রিয়েল-টাইম বিল্ডিং ম্যানেজমেন্ট ও অ্যানালিটিক্স' },
   'office.hours': { en: 'Office Hours', bn: 'অফিস সময়' },
   'office.open': { en: '9 AM - 5 PM (Open)', bn: '৯টা - ৫টা (খোলা)' },

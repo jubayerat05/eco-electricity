@@ -1,196 +1,137 @@
-# Eco Electricity: AI-Powered Smart Office IoT & Energy Analytics Dashboard
+# ⚡ Eco-Electricity
 
-An enterprise-ready full-stack Office IoT Power Monitoring & Smart Automation System. This system monitors 15 simulated electrical devices (2 fans and 3 lights across 3 rooms) from a single shared backend, exposing real-time status, analytics, and control through a **React Web Dashboard** (featuring interactive 2D/3D Floor Plan Schematics), an **AI Assistant Chatbot** powered by Google Gemini (`gemini-2.5-flash`), a **Discord Gateway Operations Bot**, and a fully customizable **Automation Rules Engine**.
+> **AI-Powered Smart Office IoT & Energy Analytics Platform**  
+> Developed & Authored by **Jubayer Rahman Chowdhury**
 
-All energy and financial audits are calculated in real-time in **Bangladeshi Taka (৳ / Tk)** using the official **Bangladesh Commercial Tariff Rate of Tk 12.39 per kWh**.
-
----
-
-## 🏗 System Architecture
-
-The project guarantees a **single source of truth** by coupling all event publishers and command interfaces to a central Node.js backend.
-
-```
-Simulated Device Layer (15 Nodes)
-        ↓ (Random Toggles / 10-30s / Speed Multiplier)
-Node.js Express + TS Backend (Shared Repository State)
-        ↓
-  +-----+-------------------+
-  ↓                         ↓
-Socket.IO Event Stream    REST HTTP Controller
-  ↓                         ↓
-React Web Dashboard       Discord Bot Gateway
-(Real-time UI updates)    (Chatbot commands & notifications)
-```
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-eco--electricity--ten.vercel.app-10B981?style=for-the-badge&logo=vercel)](https://eco-electricity-ten.vercel.app/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
 
 ---
 
-## 📁 Folder Structure
-
-```
-root
-├── backend/
-│   ├── src/
-│   │   ├── api/
-│   │   │   ├── controllers/      # Express controllers (Devices, Simulation, Power, Alerts)
-│   │   │   └── routes/           # Express router endpoints
-│   │   ├── services/             # Core business logic (Repository, PowerCalc, AlertStore)
-│   │   ├── simulation/           # Simulator timer and toggling engine
-│   │   ├── alerts/               # Alert validation and rules engine
-│   │   ├── socket/               # Socket.IO WebSocket broadcasts
-│   │   ├── discord/              # Discord.js bot listener and formatters
-│   │   ├── types/                # TypeScript shared types
-│   │   ├── config/               # Environment configuration
-│   │   └── index.ts              # Entry point
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/           # UI elements (OfficeMap, Analytics, DevicePanel, etc.)
-│   │   ├── context/              # SocketContext.tsx state sync provider
-│   │   ├── types/                # Frontend Types
-│   │   ├── App.tsx               # Main Dashboard page
-│   │   ├── main.tsx
-│   │   └── index.css             # Glassmorphism theme and animations
-│   ├── package.json
-│   ├── postcss.config.js
-│   └── tailwind.config.js
-├── docs/
-│   ├── requirements_validation.md
-│   ├── architecture.md
-│   └── SCHEMATIC.md              # Hardware wiring and pin details
-├── .env                          # Shared environment variables
-└── README.md
-```
+## 🌐 Live Application
+🔗 **Experience the Dashboard Live**: [https://eco-electricity-ten.vercel.app/](https://eco-electricity-ten.vercel.app/)
 
 ---
 
-## ⚙ Environment Variables (`.env`)
+## 📖 Overview
 
-Create a `.env` file in the root workspace folder:
+**Eco-Electricity** is an enterprise-grade IoT Energy Management & Smart Automation System designed to optimize electrical power consumption in modern office environments. The platform provides real-time monitoring of 15 electrical devices (2 fans & 3 lights across 3 designated rooms), automated alert engine triggers, real-time load analytics, and AI-driven energy optimization tips.
 
-```env
-PORT=5000
-SIMULATION_SPEED=1.0
-OFFICE_HOURS_START=9
-OFFICE_HOURS_END=17
-POWER_THRESHOLD=800
-NODE_ENV=development
+---
 
-# Discord Bot Credentials (runs in Mock Mode if empty)
-DISCORD_TOKEN=your_bot_token_here
-DISCORD_CLIENT_ID=your_client_id_here
-DISCORD_GUILD_ID=your_guild_id_here
-DISCORD_CHANNEL_ID=your_alert_channel_id_here
+## ✨ Key Features
+
+- **⚡ Real-Time IoT Control & Schematics**: Interactive 2D/3D visual floor plan mapping 15 devices with instant WebSocket sync.
+- **🤖 AI Energy Assistant**: Intelligent chatbot powered by Google Gemini for energy efficiency recommendations and status queries.
+- **🚨 Smart Automation & Alert Engine**: Automatic triggers for after-hours power usage, overtime room operation, and wattage threshold breaches.
+- **💬 Discord Gateway Integration**: Remote office management via Discord commands (`!status`, `!usage`, `!alerts`, `!room`).
+- **💰 Financial Cost Auditing**: Calculates real-time electricity costs based on official Bangladesh commercial tariff rates (৳ 12.39 / kWh).
+- **🌐 Dual Language Support**: Complete English and Bangla UI localization.
+
+---
+
+## 🏗 Architecture & Tech Stack
+
+```
+   +-------------------------------------------------------+
+   |             Simulated Device Nodes (15)               |
+   +---------------------------+---------------------------+
+                               |
+                               v
+   +-------------------------------------------------------+
+   |            Node.js + Express TS Backend               |
+   |           (Repository & Alert Controller)            |
+   +--------------+--------------------------+-------------+
+                  |                          |
+                  v                          v
+       +--------------------+      +--------------------+
+       | Socket.IO Stream   |      |  Google Gemini AI  |
+       +---------+----------+      +---------+----------+
+                 |                           |
+                 v                           v
+   +-------------------------------------------------------+
+   |               React Web Dashboard (Vite)              |
+   |              https://eco-electricity-ten.vercel.app/  |
+   +-------------------------------------------------------+
 ```
 
----
-
-## 🌐 Deploying to Render (Free Tier)
-This project is configured with a Render Blueprint configuration file (`render.yaml`) in the root directory. To deploy both the Node.js backend and the React/Vite frontend:
-1. Log in to [Render](https://dashboard.render.com/).
-2. Click **New +** and select **Blueprint**.
-3. Link your GitHub repository (`eco-electricity`).
-4. When prompted, fill in the environment variable values:
-   - `GEMINI_API_KEY`: Your Google Gemini API Key
-   - `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`, `DISCORD_CHANNEL_ID`: Discord bot config
-   - `VITE_BACKEND_URL`: Paste the URL of your deployed backend service (e.g. `https://eco-electricity-backend.onrender.com`)
-5. Click **Apply**. Render will install, compile, and host both services automatically on the Free Tier!
+| Component | Tech Stack |
+| :--- | :--- |
+| **Frontend** | React 19, TypeScript, Vite, Tailwind CSS, Framer Motion, Socket.IO Client |
+| **Backend** | Node.js, Express, TypeScript, Socket.IO, Discord.js |
+| **AI Integration** | Google Gemini API (`gemini-2.5-flash`) |
+| **Deployment** | Vercel (Frontend), Render (Backend) |
 
 ---
 
-## 🚀 Installation & Running
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm (v9 or higher)
+- **Node.js**: v18.0 or higher
+- **npm**: v9.0 or higher
 
-### 1. Running the Backend
+### 1. Clone Repository
+```bash
+git clone https://github.com/jubayerat05/eco-electricity.git
+cd eco-electricity
+```
+
+### 2. Start Backend Server
 ```bash
 cd backend
 npm install
 npm run dev
+# Server runs on http://localhost:5000
 ```
-The server will start on `http://localhost:5000`. If no Discord token is configured, the bot will log commands and alerts to the console in **Mock Mode**.
 
-### 2. Running the Frontend
+### 3. Start Frontend Dashboard
 ```bash
-cd frontend
+cd ../frontend
 npm install
 npm run dev
+# Access UI at http://localhost:5173
 ```
-The dashboard will start on `http://localhost:5173`. Open this URL in your web browser.
 
 ---
 
-## 🔌 API Endpoint Documentation
+## 🔌 API Endpoints Cheat Sheet
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/devices` | Retrieve list of all 15 devices |
-| `GET` | `/devices/:id` | Retrieve status of a specific device |
-| `POST` | `/devices/:id/toggle` | Manually toggle device status (`{"status": "ON"\|"OFF"}`) |
-| `GET` | `/rooms` | Retrieve room-level active devices and load |
-| `GET` | `/power` | Retrieve total office wattage and room breakdowns |
-| `GET` | `/usage` | Retrieve today's estimated energy consumption in kWh |
-| `GET` | `/alerts` | Retrieve list of active and resolved system alerts |
-| `POST` | `/alerts/:id/resolve` | Resolve an active system alert |
-| `GET` | `/simulation/status` | Get simulation running state and speed multiplier |
-| `POST` | `/simulation/start` | Start the random device simulator |
-| `POST | `/simulation/stop` | Stop/Pause the random device simulator |
-| `POST` | `/simulation/reset` | Reset all devices to OFF and clear accumulated energy |
+| `GET` | `/devices` | Fetch status of all 15 IoT devices |
+| `POST` | `/devices/:id/toggle` | Toggle individual device (`ON` / `OFF`) |
+| `GET` | `/power` | Retrieve live office power draw & breakdown |
+| `GET` | `/usage` | Get daily energy consumption stats (kWh & ৳) |
+| `GET` | `/alerts` | Get list of active and resolved alerts |
+| `POST` | `/simulation/start` | Start the automatic device simulation engine |
+| `POST` | `/simulation/reset` | Reset all devices and energy accumulators |
 
 ---
 
-## 💬 Discord Commands
+## 🤖 Discord Gateway Commands
 
-The bot supports prefix commands. It replies in friendly, natural-language sentences:
-
-- `!status` - Returns total active power load and active devices count.
-- `!room drawing | work1 | work2` - Returns active lights/fans and load in that room.
-- `!usage` - Displays estimated energy consumption today (in kWh).
-- `!alerts` - Lists all currently active system warnings.
-- `!help` - Displays the command list.
-
-*Example Output*:
-> "Drawing Room currently has 2 lights ON and 1 fan running, consuming about 90W."
+| Command | Action |
+| :--- | :--- |
+| `!status` | Get total office load and active device count |
+| `!room <room_name>` | Room-specific power and device breakdown |
+| `!usage` | Daily energy consumption summary |
+| `!alerts` | List all current system warnings |
+| `!help` | Display command guide |
 
 ---
 
-## 🚨 Alert Engine Rules
+## 👨‍💻 Author & Credits
 
-The backend evaluates rules on every device state transition and timer tick:
-1. **After Hours Alert** (Warning): Triggers if any light or fan is turned ON between 5 PM and 9 AM. Resolves automatically when the device is turned OFF.
-2. **Overtime Alert** (Critical): Triggers if all devices (2 fans, 4 lights) in a room remain ON continuously for > 2 hours. Resolves when any device in the room is turned OFF.
-3. **High Power Alert** (Critical): Triggers if total office power exceeds the threshold (default 800W). Resolves when the load drops below the threshold.
-
----
-
-## 🛠 Testing Guide
-
-We provide pre-packaged test scripts under `backend/src/` to verify operations without setting up external clients:
-
-1. **Simulation Engine Test**:
-   ```bash
-   npx ts-node src/test-simulator.ts
-   ```
-2. **WebSocket Integration Test**:
-   ```bash
-   npx ts-node src/test-websocket.ts
-   ```
-3. **Discord Response Formatter Test**:
-   ```bash
-   npx ts-node src/test-discord.ts
-   ```
-4. **Alert Rules Engine Test**:
-   ```bash
-   npx ts-node src/test-alerts.ts
-   ```
+Created with ❤️ by **Jubayer Rahman Chowdhury**  
+- **GitHub**: [@jubayerat05](https://github.com/jubayerat05)  
+- **Project Repository**: [eco-electricity](https://github.com/jubayerat05/eco-electricity)  
+- **Live Demo**: [https://eco-electricity-ten.vercel.app/](https://eco-electricity-ten.vercel.app/)
 
 ---
 
-## 📄 License & Team Credits
+## 📄 License
 
-- **License**: Licensed under the [MIT License](LICENSE) - open-source for hackathon evaluation.
-- **Developers**: Developed with ❤️ by the Hackathon IoT Innovations Team.
-
+This project is licensed under the [MIT License](LICENSE).

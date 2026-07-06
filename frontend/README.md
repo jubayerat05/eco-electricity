@@ -1,32 +1,30 @@
-# React + TypeScript + Vite
+# ⚡ Eco-Electricity Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> **React + TypeScript + Vite Dashboard for Eco-Electricity**  
+> Developed & Authored by **Jubayer Rahman Chowdhury**
 
-Currently, two official plugins are available:
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-eco--electricity--ten.vercel.app-10B981?style=for-the-badge&logo=vercel)](https://eco-electricity-ten.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Overview
 
-## React Compiler
+This folder contains the Web Dashboard frontend for the **Eco-Electricity** system. Built with React 19, TypeScript, Vite, Tailwind CSS, and Socket.IO for real-time WebSocket communication.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 Tech Stack
+- **Framework**: React 19 + Vite 8
+- **Language**: TypeScript 5.5
+- **Styling**: Tailwind CSS 4 + Framer Motion
+- **Icons**: Lucide React
+- **Real-Time Data**: Socket.IO Client
 
-## Expanding the Oxlint configuration
+## 📦 Getting Started
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+```bash
+# Install dependencies
+npm install
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Start local development server
+npm run dev
+
+# Build for production
+npm run build
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

@@ -1,7 +1,7 @@
 {
-  "name": "office-iot-backend",
+  "name": "eco-electricity-backend",
   "version": "1.0.0",
-  "description": "Office IoT Power Monitoring Backend",
+  "description": "Eco-Electricity Power Monitoring & Automation Backend",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
